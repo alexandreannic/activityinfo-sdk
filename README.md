@@ -1,0 +1,1 @@
+# activityinfo-sdk
