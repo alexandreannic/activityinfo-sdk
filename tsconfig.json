@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "ESNext"
+    ],
+    "strict": true,
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "outDir": "./dist",
+    "sourceMap": true,
+    "module": "CommonJS",
+    "moduleResolution": "node16"
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
+}
