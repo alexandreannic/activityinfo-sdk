@@ -6,5 +6,5 @@
   "semi": false,
   "arrowParens": "avoid",
   "proseWrap": "preserve",
-  "bracketSpacing": false,
+  "bracketSpacing": false
 }

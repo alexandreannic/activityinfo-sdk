@@ -20,6 +20,10 @@ export namespace Ai {
     }
     schema: {
       elements: FormElement[]
+      databaseId: Id
+      id: Id
+      label: string
+      schemaVersion: number
     }
   }
 

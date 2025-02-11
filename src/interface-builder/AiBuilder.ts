@@ -1,11 +1,12 @@
 import {AiBuilderSchemParser} from './AiBuilderSchemaParser'
 import {AiBuilderFileMaker} from './AiBuilderFileMaker'
 import {AiClient, Api} from '../'
+import {capitalize, slugify} from '../utils/Utils'
 
 export type AiBuilderFormArgs = {
   optionsLimit?: number
   formId: string
-  interfaceName: string
+  fileName?: string
   questionSettings: Partial<
     Record<
       string,
@@ -33,7 +34,7 @@ export class AiBuilder {
     const formTree = await sdk.fetchForm(args.formId)
     // TODO: Here we assume there won't be more than 1 nested form, and that's not good :-)
     const [form, subForm] = await new AiBuilderSchemParser(args, formTree, sdk).parse()
-    const outDir = this.props.outDir + '/src/output/activityInfo'
-    await new AiBuilderFileMaker(args.interfaceName, form, subForm).make(outDir)
+    const fileName = args.fileName ?? slugify(formTree[args.formId].schema.label)
+    await new AiBuilderFileMaker(fileName, form, subForm).make(this.props.outDir)
   }
 }

@@ -53,7 +53,6 @@ export class AiBuilderSchemParser {
   private readonly getChoices = async (
     schema: Ai.FormSchema['schema']['elements'][0],
   ): Promise<{
-    label: string
     formId: Ai.Id
     formChoiceId: Ai.Id
     optionDefId: Ai.Id
@@ -61,19 +60,25 @@ export class AiBuilderSchemParser {
   }> => {
     const qSettings = this.args.questionSettings[schema.label]
     const formChoiceId = schema.typeParameters.range![0].formId
-    const getDefaultColumnId = (): Ai.Id => {
-      return (
-        this.formTree[formChoiceId].schema.elements.find(
-          _ => _.code === schema.code || (_.code ?? '').includes('ENG'),
-        ) ?? this.formTree[formChoiceId].schema.elements[0]
-      ).id
+    const getDefaultColumnIds = (): Ai.Id[] => {
+      // return this.formTree[formChoiceId].schema.elements.filter(_ => _.required).map(_ => _.id)
+      return [
+        (
+          this.formTree[formChoiceId].schema.elements.find(
+            _ => _.code === schema.code || (_.code ?? '').includes('ENG'),
+          ) ?? this.formTree[formChoiceId].schema.elements[0]
+        ).id,
+      ]
     }
     const getSelectedColumns = (): Ai.Id[] | undefined => {
       const columnsLabels = qSettings?.selectColumnByLabels
       if (!columnsLabels) return undefined
       return this.formTree[formChoiceId].schema.elements.filter(_ => columnsLabels.includes(_.label)).map(_ => _.id)
     }
-    const optionDefIds = getSelectedColumns() ?? [getDefaultColumnId()]
+    const optionDefIds = getSelectedColumns() ?? getDefaultColumnIds()
+    if (schema.code === 'plan_code') {
+      console.log('>>>>', schema.label, formChoiceId)
+    }
     const choices = await this.sdk.fetchColumns(
       formChoiceId,
       optionDefIds,
@@ -85,8 +90,8 @@ export class AiBuilderSchemParser {
       if (this.args.optionsLimit !== undefined) return choices.splice(0, this.args.optionsLimit)
       return choices
     })()
+
     return {
-      label: schema.label,
       formId: schema.id,
       formChoiceId: formChoiceId,
       optionDefId: formChoiceId,

@@ -11,7 +11,7 @@
     "outDir": "./dist",
     "sourceMap": true,
     "module": "CommonJS",
-    "moduleResolution": "node16"
+    "moduleResolution": "Node"
   },
   "include": [
     "src"

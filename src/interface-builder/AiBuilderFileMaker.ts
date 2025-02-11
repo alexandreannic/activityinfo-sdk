@@ -1,8 +1,6 @@
 import {fnSwitch} from '@alexandreannic/ts-utils'
 import * as fs from 'node:fs'
 import * as prettier from 'prettier'
-import path from 'node:path'
-import {capitalize} from '../utils/utils'
 import {AiParsedSchema} from './AiBuilderSchemaParser'
 
 export class AiBuilderFileMaker {
@@ -13,19 +11,25 @@ export class AiBuilderFileMaker {
   ) {}
 
   private readonly formatCode = async (textContent: string): Promise<string> => {
-    const prettierConfig = await prettier.resolveConfig(path.join('./../../.prettierrc'))
     return await prettier.format(textContent, {
-      ...prettierConfig,
+      singleQuote: true,
+      trailingComma: 'all',
+      printWidth: 200,
+      tabWidth: 2,
+      semi: false,
+      arrowParens: 'avoid',
+      proseWrap: 'preserve',
+      bracketSpacing: false,
       parser: 'typescript',
     })
   }
 
   readonly make = async (outDir: string) => {
-    const filePath = outDir + '/AiType' + capitalize(this.name) + '.ts'
+    const filePath = outDir + '/AiType' + this.name + '.ts'
     console.log(`Generate into ${filePath}`)
 
     const textContent = [
-      `export namespace AiType${capitalize(this.name)} {`,
+      `export namespace AiType${this.name} {`,
       this.makeInterface(this.parsedForm),
       this.makeMappingFunction(this.parsedForm),
       this.makeChoices(this.parsedForm),
@@ -39,6 +43,7 @@ export class AiBuilderFileMaker {
       '}',
     ].join('\n\n')
 
+    fs.mkdirSync(outDir, {recursive: true})
     try {
       fs.writeFileSync(filePath, await this.formatCode(textContent))
     } catch (e) {
@@ -47,58 +52,54 @@ export class AiBuilderFileMaker {
     }
   }
 
-  readonly makeChoices = (d: AiParsedSchema[], prefix = '') => {
+  readonly makeChoices = (d: AiParsedSchema[], name = '') => {
     return [
-      `export const options${capitalize(prefix)} = {`,
+      `export const options${name} = {`,
       d
         .filter(_ => !!_.options)
-        .map(q => `${q.code}: { ${q.options?.map(o => `"${o.label}": '${o.id}'`).join(',\n    ')}}`)
+        .map(q => `'${q.label}': { ${q.options?.map(o => `"${o.label}": '${o.id}'`).join(',\n    ')}}`)
         .join(',\n'),
       '}',
     ].join('\n')
   }
 
-  readonly makeMappingFunction = (d: AiParsedSchema[], prefix = '') => {
+  readonly makeMappingFunction = (d: AiParsedSchema[], name = '') => {
     return [
-      `export const map${capitalize(prefix)} = (a: Type${capitalize(prefix)}) => ({`,
+      `export const map${name} = (a: Type${name}) => ({`,
       d
         .map(q => {
           const mapValue = fnSwitch(
             q.type,
             {
-              enumerated: () => `options${capitalize(prefix)}['${q.label}'][a['${q.label}']!]`,
-              reference: () => `'${q.optionsId}' + ':' + options${capitalize(prefix)}['${q.label}'][a['${q.label}']!]`,
+              enumerated: () => `a['${q.label}'] ? options${name}['${q.label}'][a['${q.label}']!] : undefined`,
+              reference: () =>
+                `a['${q.label}'] ? '${q.optionsId}' + ':' + options${name}['${q.label}'][a['${q.label}']!] : undefined`,
             },
             _ => `a['${q.label}']`,
           )
-          return `'${q.id}': a['${q.label}'] === undefined ? undefined : ${mapValue}`
+          return `['${q.label}']: ${mapValue}`
         })
         .join(',\n'),
       '})',
     ].join('\n')
   }
 
-  readonly makeInterface = (d: AiParsedSchema[], prefix = '') => {
+  readonly makeInterface = (d: AiParsedSchema[], name = '') => {
     return [
-      `type Opt${capitalize(prefix)}<T extends keyof typeof options${capitalize(prefix)}> = keyof (typeof options${capitalize(prefix)})[T]`,
-      `export interface Type${capitalize(prefix)}`,
+      `type Opt${name}<T extends keyof typeof options${name}> = keyof (typeof options${name})[T]`,
+      `export interface Type${name}`,
       '{',
-      d
-        .flatMap(q => [
-          `/**\n      ${q.label}${q.description ? '\n      ' + q.description.replaceAll(/\s/g, ' ') : ''}    */`,
-          `${q.code}${q.required ? '' : '?'}: ${this.getType(q, prefix)}`,
-        ])
-        .join('\n'),
+      d.flatMap(q => [`'${q.label}'${q.required ? '' : '?'}: ${this.getType(q, name)}`]).join('\n'),
       '}',
     ].join('\n')
   }
 
-  private getType(q: AiParsedSchema, prefix: string): string {
+  private getType(q: AiParsedSchema, name: string): string {
     return fnSwitch(
       q.type,
       {
-        reference: `Opt${capitalize(prefix)}<'${q.code}'>`,
-        enumerated: `Opt${capitalize(prefix)}<'${q.code}'>`,
+        reference: `Opt${name}<'${q.label}'>`,
+        enumerated: `Opt${name}<'${q.label}'>`,
         quantity: 'number',
       },
       _ => 'string',
