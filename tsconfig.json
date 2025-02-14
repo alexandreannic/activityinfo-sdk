@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "lib": [
-      "ESNext"
-    ],
+    "lib": ["ESNext"],
     "strict": true,
     "target": "ESNext",
     "esModuleInterop": true,
@@ -11,13 +9,9 @@
     "outDir": "./dist",
     "sourceMap": true,
     "module": "CommonJS",
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "disableSizeLimit": true
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ]
+  "include": ["src"],
+  "exclude": ["src/interface", "**/*.spec.ts", "**/*.test.ts"]
 }

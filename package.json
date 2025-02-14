@@ -14,8 +14,8 @@
     "release-patch": "./release.sh patch",
     "release-minor": "./release.sh minor",
     "release-major": "./release.sh major",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "test": "node --loader tsx --test src/**/*.spec.ts"
+    "build": "tsup",
+    "test": "node --import tsx --test src/**/*.spec.ts"
   },
   "author": "",
   "license": "ISC",
@@ -25,7 +25,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "@alexandreannic/ts-utils": "^2.1.19",
+    "@alexandreannic/ts-utils": "^2.1.20",
     "@types/node": "^22.13.1",
     "dotenv": "^16.4.7",
     "node-fetch": "^3.3.2",

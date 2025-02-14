@@ -1,0 +1,8 @@
+export * from './2025/AiTypeSnfiRmm'
+// export * from './2024/AiTypeGenderBasedViolenceRmm'
+// export * from './2024/AiTypeMineActionRmm'
+export * from './2024/AiTypeProtectionRmm'
+// export * from './2024/AiTypeGenderBasedViolenceRmm'
+// export * from './2024/AiTypeMpcaResponseMonitoringModule2024'
+// export * from './2024/AiTypeFslcResponseMonitoringModule'
+// export * from './2024/AiTypeSnfiResponseMonitoringModule'

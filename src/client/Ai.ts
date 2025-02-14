@@ -23,20 +23,32 @@ export namespace Ai {
       databaseId: Id
       id: Id
       label: string
+      code: string
       schemaVersion: number
     }
   }
+
+  export type FormElementType =
+    | 'subform'
+    | 'reference'
+    | 'enumerated'
+    | 'calculated'
+    | 'quantity'
+    | 'FREE_TEXT'
+    | 'month'
+    | string
 
   export type FormElement = {
     id: Id
     code: string
     label: string
     description: string
+    key?: boolean
     relevanceCondition: string
     validationCondition: string
     required: boolean
-    type: 'subform' | 'reference' | 'enumerated' | 'calculated' | 'quantity' | 'FREE_TEXT' | 'month' | string
-    typeParameters: {
+    type: FormElementType
+    typeParameters?: {
       formId?: Id
       cardinality?: 'single'
       range?: [{formId: Id}]
@@ -50,5 +62,21 @@ export namespace Ai {
     label: string
     description: string
     ownerId: string
+  }
+
+  export type Request = Request.T
+  export namespace Request {
+    export type Activity = Record<string, any>
+
+    export type T = {
+      changes: Content[]
+    }
+
+    export type Content = {
+      formId: Id
+      recordId: Id
+      parentRecordId: Id | null
+      fields: Activity
+    }
   }
 }

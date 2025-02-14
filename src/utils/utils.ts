@@ -10,3 +10,4 @@ export const slugify = (_: string) =>
     .split(/\s/)
     .map(capitalize)
     .join('')
+

@@ -6,8 +6,7 @@ export class Api {
   constructor(
     private token: string,
     private baseUrl = 'https://www.activityinfo.org',
-  ) {
-  }
+  ) {}
 
   readonly request = (path: string, init?: ApiParams): Promise<any> => {
     return fetch(this.baseUrl + path, {
@@ -23,11 +22,11 @@ export class Api {
   }
 
   readonly get = <T = any>(path: string, init?: ApiParams): Promise<T> => {
-    return this.request(path, {...init, method: 'GET'}).then((_) => _.json())
+    return this.request(path, {...init, method: 'GET'}).then(_ => _.json())
   }
 
   readonly post = (path: string, init?: ApiParams) => {
-    return this.request(path, {...init, method: 'POST'}).then((_) => _.json())
+    return this.request(path, {...init, method: 'POST'}).then(_ => _.json())
   }
 
   readonly delete = (path: string, init?: ApiParams) => {
@@ -35,6 +34,6 @@ export class Api {
   }
 
   readonly postNoJSON = (path: string, init?: ApiParams) => {
-    return this.request(path, {...init, method: 'POST'}).then((_) => _.text())
+    return this.request(path, {...init, method: 'POST'}).then(_ => _.text())
   }
 }
