@@ -4,7 +4,10 @@ import * as fs from 'node:fs'
 import {fnSwitch, Obj} from '@alexandreannic/ts-utils'
 
 export class AiBuilderFile {
-  constructor(private forms: AiBuilderSchema.Form[]) {}
+  constructor(
+    private forms: AiBuilderSchema.Form[],
+    private maxListSize = 5000,
+  ) {}
 
   private readonly formatCode = async (textContent: string): Promise<string> => {
     return await prettier.format(textContent, {
@@ -104,16 +107,28 @@ export class AiBuilderFile {
       `export interface Type`,
       '{',
       form.questions
-        .flatMap(q => [
-          `/**\n      ${q.label}${q.description ? '\n      ' + q.description.replaceAll(/\s/g, ' ') : ''}\n    */`,
-          `${q.code}${q.required ? '' : '?'}: ${this.getType(q)}`,
-        ])
+        .flatMap(q => {
+          const choices = form.choices[q.typeRef!] ?? []
+          const skipTyping = choices.length > this.maxListSize
+          const tab = '      '
+          return [
+            `/**`,
+            q.label ? tab + `${q.label}` : undefined,
+            q.description ? tab + `${q.description}` : undefined,
+            skipTyping ? tab + `⚠️ Typing is omitted due to the large number of choices.` : undefined,
+            skipTyping ? tab + `➡️ Directly use label from AiType${form.code}.options['${q.typeRef}']` : undefined,
+            tab.slice(2) + `*/`,
+            `${q.code}${q.required ? '' : '?'}: ${this.getType(q, skipTyping)}`,
+          ]
+        })
+        .filter(_ => !!_)
         .join('\n'),
       '}',
     ].join('\n')
   }
 
-  private getType(q: AiBuilderSchema.Question): string {
+  private getType(q: AiBuilderSchema.Question, skipTyping?: boolean): string {
+    if (skipTyping) return 'string'
     return fnSwitch(
       q.type,
       {

@@ -37,8 +37,10 @@ export namespace AiTypeSnfiRmm {
     adm3: Opt<'Admin 3'>
     /**
       Settlement
+      ⚠️ Typing is omitted due to the large number of choices.
+      ➡️ Directly use label from AiTypeSnfiRmm.options['Admin 4']
     */
-    adm4: Opt<'Admin 4'>
+    adm4: string
     /**
       Collective Sites
     */
