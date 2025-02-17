@@ -6,7 +6,7 @@ import {fnSwitch, Obj} from '@alexandreannic/ts-utils'
 export class AiBuilderFile {
   constructor(
     private forms: AiBuilderSchema.Form[],
-    private maxListSize = 5000,
+    private maxListSize = 20000,
   ) {}
 
   private readonly formatCode = async (textContent: string): Promise<string> => {
@@ -56,9 +56,11 @@ export class AiBuilderFile {
     return [
       `export const options = {`,
       Obj.entries(form.choices)
-        .map(
-          ([choicesKey, choices]) =>
+        .map(([choicesKey, choices]) =>
+          [
             `"${choicesKey}": { ${choices?.map(o => `"${o.label.replaceAll('"', '\\"')}": '${o.id}'`).join(',\n    ')}}`,
+            choices.length > this.maxListSize ? ` as Record<string, string>` : '',
+          ].join(''),
         )
         .join(',\n'),
       '}',

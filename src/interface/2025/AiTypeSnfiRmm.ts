@@ -33992,7 +33992,7 @@ export namespace AiTypeSnfiRmm {
       Kyiv_UA8000000000_Киів: 'cl1seqdm5mqeqhhmxb',
       Sevastopol_UA8500000000_Севастополь: 'cyfgbacm5mqeqhhmxc',
       _NA: 'crs9j1om74filid2',
-    },
+    } as Record<string, string>,
     'Collective Sites': {
       _NA: 'c6k6a18m4wixqrz2fk9',
       'UKRs003789_Гуртожиток Кам’янського вищого професіиного училища': 'cd7kfoom4wixqrz2fka',
